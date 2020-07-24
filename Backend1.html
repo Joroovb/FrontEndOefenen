@@ -1,41 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script>
-        function opnaardebackend(){
+        function opnaardebackend() {
             var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function(){
+            xhr.onreadystatechange = function () {
                 hetObject = JSON.parse(this.responseText);
                 console.log(this.response);
-               document.getElementById("uitkomst").innerHTML = hetObject.name;
+                document.getElementById("uitkomst").innerHTML = hetObject.name;
             }
 
-            xhr.open("GET","http://localhost:8082/joris/jojo2",true);
-            xhr.send();                
-            }
-        
+            xhr.open("GET", "http://localhost:8082/joris/jojo2", true);
+            xhr.send();
+        }
+
         function posten() {
             var obj = {};
             obj.name = document.getElementById("denaam").value;
+            obj.salary = document.getElementById("hetsalaris").value;
             objJSON = JSON.stringify(obj);
             var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function(){
+            xhr.onreadystatechange = function () {
                 console.log("Antwoord in console");
             }
-            xhr.open("POST","http://localhost:8082/joris/jojo2",true);
-            xhr.setRequestHeader("Content-type","application/json")
+            xhr.open("POST", "http://localhost:8082/api/employee/new", true);
+            xhr.setRequestHeader("Content-type", "application/json")
             xhr.send(objJSON);
         }
+
+        function employeesKrijgen() {
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+               
+                if(this.readyState == 4) {
+                    
+                    var inhoudDB = JSON.parse(this.responseText);
+                    var employeestring = "";
+                    var x;
+
+                    for (x = 0; x < inhoudDB.length; x++) {
+                        employeestring += 
+                        ` 
+                        <div>
+                        <h3>Name = ${inhoudDB[x].name} </h3>
+                        <p>ID = ${inhoudDB[x].id} </p>
+                        <p>Salaris = ${inhoudDB[x].salary}</p>
+                        <p>Telefoon = ${inhoudDB[x].phone} </p>
+                        </div>
+                        `
+                    } 
+                    document.getElementById("employeeinfo").innerHTML = employeestring;
+            
+                }
+            }
+            xhr.open("GET", "http://localhost:8082/api/employee/all", true);
+            xhr.send();
+        }
+        
     </script>
 
 </head>
-<body>
 
-    <input type=text id=denaam><input type=button onclick=posten() value=versturen>
+<body>
+    <!--<label for=denaam>Naam</label>-->
+    <input type=text id=denaam name=denaam placeholder="Naam"><input type=text id=hetsalaris placeholder="Salaris"><input type=button onclick=posten() value=versturen>
     <input type="button" onclick="opnaardebackend()" value="Op naar de backend">
     <div id=uitkomst>Hij doet het</div>
+    <input type="button" onclick="employeesKrijgen()" value="Get Employees">
+    <div id=employeeinfo></div>
 </body>
+
 </html>
+
