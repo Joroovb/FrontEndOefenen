@@ -6,18 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script>
-        function opnaardebackend() {
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function () {
-                hetObject = JSON.parse(this.responseText);
-                console.log(this.response);
-                document.getElementById("uitkomst").innerHTML = hetObject.name;
-            }
-
-            xhr.open("GET", "http://localhost:8082/joris/jojo2", true);
-            xhr.send();
-        }
-
         function posten() {
             var obj = {};
             obj.name = document.getElementById("denaam").value;
@@ -37,7 +25,6 @@
             xhr.onreadystatechange = function () {
                
                 if(this.readyState == 4) {
-                    
                     var inhoudDB = JSON.parse(this.responseText);
                     var employeestring = "";
                     var x;
@@ -60,18 +47,49 @@
             xhr.open("GET", "http://localhost:8082/api/employee/all", true);
             xhr.send();
         }
-        
+
+        function verandersalaris() {
+            var xhr = new XMLHttpRequest();
+            var id = document.getElementById("id").value
+            var obj = {};
+            obj.salary = document.getElementById("nieuwsalaris").value;
+            objJSON = JSON.stringify(obj);
+            xhr.onreadystatechange = function () {
+               console.log("Salaris veranderd!")
+            }
+            xhr.open("PUT", "http://localhost:8082/api/employee/changesalary/" + id, true);
+            xhr.setRequestHeader("Content-type", "application/json")
+            xhr.send(objJSON);
+        }
+
+        function verwijdermedewerker(){
+            var xhr = new XMLHttpRequest();
+            var id = document.getElementById("idverwijderen").value
+            xhr.onreadystatechange = function () {
+               console.log("Medewerker verwijderd!")
+            }
+            xhr.open("DELETE", "http://localhost:8082/api/employee/delete/" + id, true);
+            xhr.send();
+       
+       
+        }
+ 
     </script>
 
 </head>
 
 <body>
     <!--<label for=denaam>Naam</label>-->
+    <h1>Voeg nieuwe mederwerkers toe</h1>
     <input type=text id=denaam name=denaam placeholder="Naam"><input type=text id=hetsalaris placeholder="Salaris"><input type=button onclick=posten() value=versturen>
-    <input type="button" onclick="opnaardebackend()" value="Op naar de backend">
-    <div id=uitkomst>Hij doet het</div>
+
     <input type="button" onclick="employeesKrijgen()" value="Get Employees">
     <div id=employeeinfo></div>
+
+    <input type=text id=id placeholder="ID"><input type=text id=nieuwsalaris placeholder="Het nieuwe salaris"><input type=button onclick=verandersalaris() value="Update Salaris">
+    <div></div>
+    <input type=text id=idverwijderen placeholder="ID"><input type=button onclick=verwijdermedewerker() value="Verwijder Medewerker">
+
 </body>
 
 </html>
