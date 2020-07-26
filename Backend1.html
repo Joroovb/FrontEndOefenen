@@ -25,28 +25,41 @@
             xhr.onreadystatechange = function () {
                
                 if(this.readyState == 4) {
+
                     var inhoudDB = JSON.parse(this.responseText);
                     var employeestring = "";
                     var x;
-
+                    
                     for (x = 0; x < inhoudDB.length; x++) {
-                        employeestring += 
-                        ` 
-                        <div>
-                        <h3>Name = ${inhoudDB[x].name} </h3>
-                        <p>ID = ${inhoudDB[x].id} </p>
-                        <p>Salaris = ${inhoudDB[x].salary}</p>
-                        <p>Telefoon = ${inhoudDB[x].phone} </p>
-                        </div>
-                        `
-                    } 
+                        try{
+                            employeestring += 
+                            ` 
+                            <div>
+                            <h3>Name = ${inhoudDB[x].name} </h3>
+                            <p>ID = ${inhoudDB[x].id} </p>
+                            <p>Salaris = ${inhoudDB[x].salary}</p>
+                            <p>Telefoon = ${inhoudDB[x].phone.phoneNumber} </p>
+                            </div>
+                            `
+
+                        }catch (err) {
+                  
+                            employeestring += 
+                            ` 
+                            <div>
+                            <h3>Name = ${inhoudDB[x].name} </h3>
+                            <p>ID = ${inhoudDB[x].id} </p>
+                            <p>Salaris = ${inhoudDB[x].salary}</p>
+                            </div>
+                            ` 
+                        }
+                    }
                     document.getElementById("employeeinfo").innerHTML = employeestring;
-            
                 }
             }
             xhr.open("GET", "http://localhost:8082/api/employee/all", true);
             xhr.send();
-        }
+    }
 
         function verandersalaris() {
             var xhr = new XMLHttpRequest();
@@ -70,8 +83,55 @@
             }
             xhr.open("DELETE", "http://localhost:8082/api/employee/delete/" + id, true);
             xhr.send();
-       
-       
+        }
+
+        function nieuwetelefoon() {
+            var xhr = new XMLHttpRequest();
+            var obj = {};
+            obj.phoneNumber = document.getElementById("telefoonnummer").value
+            objJSON = JSON.stringify(obj);
+            xhr.onreadystatechange = function () {
+               console.log("Nieuwe telefoon gemaakt")
+            }
+            xhr.open("POST", "http://localhost:8082/api/phone/new", true);
+            xhr.setRequestHeader("Content-type", "application/json");
+            xhr.send(objJSON)
+        }
+
+        function telefoonsKrijgen() {
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+               
+                if(this.readyState == 4) {
+                    var inhoudDB = JSON.parse(this.responseText);
+                    var telefoonstring = "";
+                    var x;
+
+                    for (x = 0; x < inhoudDB.length; x++) {
+                        telefoonstring += 
+                        ` 
+                        <div>
+                        <p>ID = ${inhoudDB[x].id} </p>
+                        <p>Nummer = ${inhoudDB[x].phoneNumber}</p>
+                        </div>
+                        `
+                    } 
+                    document.getElementById("telefooninfo").innerHTML = telefoonstring;
+                }
+            }
+            xhr.open("GET", "http://localhost:8082/api/phone/all", true);
+            xhr.send();
+        }
+
+        function telefoonenemployee() {
+            var xhr = new XMLHttpRequest();
+            var id = document.getElementById("employeeID").value
+            var phoneid = document.getElementById("telefoonid").value
+            xhr.onreadystatechange = function () {
+               console.log("Telefoon toegevoegd!")
+            }
+            xhr.open("PUT", "http://localhost:8082/api/employee/addphone/" + id + "/" + phoneid, true);
+            xhr.send();
         }
  
     </script>
@@ -89,7 +149,12 @@
     <input type=text id=id placeholder="ID"><input type=text id=nieuwsalaris placeholder="Het nieuwe salaris"><input type=button onclick=verandersalaris() value="Update Salaris">
     <div></div>
     <input type=text id=idverwijderen placeholder="ID"><input type=button onclick=verwijdermedewerker() value="Verwijder Medewerker">
+    <div></div>
+    <input type="text" id=telefoonnummer placeholder="Nummer"><input type=button onclick="nieuwetelefoon()" value="Nieuwe Telefoon"><input type="button" onclick="telefoonsKrijgen()" value="Get Phones">
+    <div id=telefooninfo></div>
+    <div></div>
 
+    <input type="text" id=telefoonid placeholder="Telefoon ID"><input type=text id=employeeID placeholder="Employee ID"><input type=button onclick="telefoonenemployee()" value="Toevoegen aan Employee">
 </body>
 
 </html>
